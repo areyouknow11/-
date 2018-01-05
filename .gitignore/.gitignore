@@ -1,0 +1,191 @@
+<template>
+    <div>
+        <table id="cart">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="selAll" v-model="isAllselect" @click="selectAll()">
+                        <label for="sel">全选</label>
+                    </th>
+                    <th>商品</th>
+                    <th>单价（元）</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(list,index) in lists">
+                    <td>
+                        <input type="checkbox" v-model="list.checked"  @click="selectOne(index)">
+                        <img :src="list.img" alt="">
+                    </td>
+                    <td>{{list.name}}</td>
+                    <td>{{list.price}}</td>
+                    <td>
+                         <button @click="reduce(index)">-</button>
+                         <input type="text" :value="list.count"/>
+                         <button @click="add(index)">+</button>
+                       </td>
+                    <td>{{list.price*list.count}}</td>
+                    <td>
+                        <a href="#" @click="dele(index)">删除</a>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><b>总价</b></td>
+                    <td>{{totalPrice}}</td>
+                    <td>
+                        <a href="#">结 算</a>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</template>
+<script>
+export default {
+  name: 'Product',
+  data () {
+    return {
+     lists:[
+         {img:require("./../assets/phone_01.jpg"), name:"小米Note",price:1120,count:1,checked:false},
+         {img:require("./../assets/phone_02.jpg"), name:"华为Note",price:2120,count:2,checked:false},
+         {img:require("./../assets/phone_03.jpg"), name:"索尼Note",price:3120,count:3,checked:false},
+         {img:require("./../assets/phone_04.jpg"), name:"三星Note",price:4120,count:4,checked:false}
+     ],
+     totalPrice:0,
+     totalCount:0,
+     isAllselect:false
+    }
+  },
+  /*挂载总价函数*/
+  mounted:function(){
+      this.allPrice();
+  },
+  /*购物车方法*/
+  methods:{
+    /*计算总价*/
+    allPrice(){
+        this.totalPrice=0;/*总价初始值*/
+        this.totalCount=0;/*总量初始值*/
+        for(var i=0;i<this.lists.length;i++){
+            var _this=this.lists[i];
+            if(_this.checked){/*当选中时计算总价*/
+                this.totalPrice+=this.lists[i].price*this.lists[i].count;
+            }
+        }
+        return this.totalPrice;
+    },
+    /*点击减号操作*/
+    reduce(index){
+         if(this.lists[index].count<=1){
+             return;
+         }else{
+             this.lists[index].count--;
+         }
+         this.allPrice();/*调用总价*/
+    },
+    /*点击加号操作*/
+    add(index){
+        this.lists[index].count++;
+        this.allPrice();/*调用总价*/
+    },
+    /*点击删除操作*/
+    dele(index){ 
+        this.lists.splice(index,1);
+        this.allPrice();/*调用总价*/
+    },
+    /*单选功能*/
+    selectOne(index){
+        if(this.lists[index].checked==true){/*如果当前选中，则当前改为false，且全选改为false*/
+            this.lists[index].checked=false;
+            this.isAllselect=false;
+        }else{
+            this.lists[index].checked=true;
+        }
+        this.allPrice();/*调用总价*/
+    },
+    /*全选功能*/
+    selectAll(){
+        if(this.isAllselect){/*如果全选选中，当单选有没选中时，全选改为false*/
+            for(var i=0;i<this.lists.length;i++){
+                this.lists[i].checked=false;
+            }
+            this.isAllselect=false;
+        }else{
+            for(var i=0;i<this.lists.length;i++){
+                this.lists[i].checked=true;
+            }
+            this.isAllselect=true;
+        }
+        this.allPrice();/*调用总价*/
+    }
+  }
+}
+</script>
+<style>
+    #cart{
+        border: 1px solid #f1f1f1;
+        border-top: 4px solid #aaa;
+        width: 1600px;
+        background-color: #fcfffa;
+        margin: 0px auto;
+        margin-top: 50px;
+        border-collapse: collapse;
+    }
+    #cart td, #cart th {
+        min-height: 40px;
+        line-height: 80px;
+        border-top: 1px solid #f1f1f1;
+        border-bottom: 1px solid #f1f1f1;
+        padding: 5px;
+        vertical-align: top;
+        text-align: left;
+    }
+    #cart tbody>tr>td>button{
+        border: 1px solid #CACBCB;
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        background-color: #fff;
+        box-sizing: content-box;
+        cursor: pointer;
+    }
+    #cart tfoot>tr>td>a{
+        display:block;
+        text-decoration:none;
+        width:120px;
+        height:60px;
+        background-color: #e4393c;
+        box-sizing: content-box;
+        color:azure;
+        font-size: 28px;
+        text-align: center;
+        line-height: 60px;
+
+    }
+    #cart input[type='text'] {
+        border: 1px solid #CACBCB;
+        height: 30px;
+        width: 100px;
+        text-align: center;
+    }
+    #cart>thead>tr>th>input[type='checkbox']{
+        vertical-align:middle;
+    }
+    #cart input[type='checkbox']{
+        width:30px;
+        height:30px;
+        vertical-align:top;
+    }
+    a{
+        color:crimson;
+        text-decoration:none;
+    }
+</style>
